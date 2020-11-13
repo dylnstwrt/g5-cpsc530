@@ -31,13 +31,3 @@ def nist_entropy(password):
     if (not(password in common_passes) and (len(password) < 20)):
         entropy += 6
     return entropy
-
-'''
-def main():
-    print(nist_entropy("a"))
-    print (nist_entropy("abc"))
-    print(nist_entropy("Password123"))
-
-if __name__ == "__main__":
-    main()
-'''

@@ -1,33 +1,76 @@
+#!/usr/bin/python3
 import csv
 import math
-from random import random
-from tqdm import tqdm
+import random
+import sys
+#pip
+import tqdm
 from zxcvbn import zxcvbn
+#local
 from nist import nist_entropy
+
+FILENAME = "./resources/rockyou.txt"
+
+
+def generate_passlist(size) -> list:
+    '''
+    method:
+        generates a list of passwords by randomly selecting a number of passwords
+        based on params from a password file.
+
+    parameters:
+        size : int
+            number of passwords to select from file.
+    '''
+    passwords = list()
+    file = open(FILENAME, encoding="ISO-8859-1")
+    lines = file.readlines()
+    for i in tqdm.trange(size):
+        try:
+            random_lines = random.choice(lines)
+            passwords.append(random_lines.strip("\n"))
+            # print(random_lines)
+        except Exception:
+            continue
+    return passwords
+
+
+def brute_attempts(password) -> int:
+    '''
+    method:
+        calculates number of brute attempts;
+        TODO crude; could use more refinement.
+
+    parameters:
+        password : string
+            password to be analyzed.
+    '''
+    return (pow(69, len(password)))
 
 
 def main():
-    errCount = 0
-    with open("./resources/rockyou.txt", "r", encoding="ISO-8859-1") as file:
-        for password in tqdm(file):
-            try:
-                #artifact with encoding
-                password = password.strip('\n')
-                # assumes no space in special character set; thus 33 special, 10 digit, and 26 alphabetical
-                brute_attempts = (pow(69, len(password)))
+    pattern_freqs = dict()  # keep track of unique patterns for summary
+    passwords = generate_passlist(10000)
 
-                results = zxcvbn(password) # dict
-                sequences = results.get("sequence") # list of dicts
+    for password in tqdm.tqdm(passwords):
+        try:
+            results = zxcvbn(password)  # dict
+            # TODO refactor into separate method.
+            sequence = results.get("sequence")  # list of dicts
+            # number of patterns =
+            for pattern in sequence:
+                pattern_name = pattern.get("pattern")
+                if pattern_name == "dictionary":
+                    pattern_name += "-"+pattern.get("dictionary_name")
+                    if (pattern.get("l33t")):
+                        pattern_name += "-l33t"
+                    if (pattern.get("reversed")):
+                        pattern_name += "-reversed"
+                pattern_freqs[pattern_name] = pattern_freqs.get(
+                    pattern_name, 0) + 1  # update frequency dict
+        except Exception:
+            continue
 
-                for sequence in sequences:
-                    pattern = sequence.get("pattern")
-                    if (sequence.get("l33t")): pattern += "-l33t"
-                    if (sequence.get("reversed")): pattern += "-reversed"
-                    print(pattern)
-            except Exception:
-                errCount += 1
-                continue
 
 if __name__ == "__main__":
     main()
- 
