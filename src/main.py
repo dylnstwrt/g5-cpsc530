@@ -39,15 +39,30 @@ def brute_attempts(password) -> int:
     '''
     method:
         calculates number of brute attempts;
-        TODO crude; could use more refinement.
+        TODO take into account LUDS requirements, and length requirements (total - bad_passwords)
 
     parameters:
         password : string
             password to be analyzed.
     '''
+    #TODO deal with case sensitivity
     return (pow(69, len(password)))
 
+    #TODO password strength entropy using brute guesses vs. zxcvbn guesses
+    '''
 
+    stats:
+        - frequence of pattern
+        - number of patterns in a password
+            - histogram of password patterns
+        - password guesses
+            - brute force
+        - password entropy
+            - nist (luds)
+                - informational vs. strength
+            - zxcvbn
+        - most commmon warnings/feedback
+    '''
 def main():
     pattern_freqs = dict()  # keep track of unique patterns for summary
     passwords = generate_passlist(10000)
