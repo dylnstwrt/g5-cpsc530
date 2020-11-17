@@ -9,8 +9,8 @@ from zxcvbn import zxcvbn
 # local
 from nist import nist_entropy
 
-FILENAME = "./resources/rockyou.txt"
-
+IN_FILENAME = "./resources/rockyou.txt"
+OUT_FILENAME = "./resources/run_stats.csv"
 
 def generate_passlist(size) -> list:
     '''
@@ -23,7 +23,7 @@ def generate_passlist(size) -> list:
             number of passwords to select from file.
     '''
     passwords = list()
-    file = open(FILENAME, encoding="ISO-8859-1")
+    file = open(IN_FILENAME, encoding="ISO-8859-1")
     lines = file.readlines()
     for i in tqdm.trange(size):
         try:
@@ -84,6 +84,10 @@ def main():
     warning_freqs = dict()
     passwords = generate_passlist(10000)
 
+    stats_file = open(OUT_FILENAME, mode="w")
+    stats_writer = csv.writer(stats_file, delimiter=",", quotechar='"')
+    stats_writer.writerow(['Password','Password Length', 'Warning', 'Pattern Count', 'Patterns' ,
+                        'Naive Attempts', 'ZXCVBN Attempts', 'Naive Entropy', 'Nist Entropy', 'ZXCVBN Entropy'])
     for password in tqdm.tqdm(passwords):
         try:
             pass_length_freqs[len(password)] = pass_length_freqs.get(len(password), 0) + 1
@@ -95,6 +99,7 @@ def main():
 
             sequence = results.get("sequence")  # list of dicts
             pattern_count = len(sequence)
+            pattern_to_write = ""
 
             for pattern in sequence:
                 pattern_name = pattern.get("pattern")
@@ -106,7 +111,12 @@ def main():
                         pattern_name += "-reversed"
                 pattern_freqs[pattern_name] = pattern_freqs.get(
                     pattern_name, 0) + 1  # update frequency dict
-
+                if (pattern_to_write == ""):
+                    pattern_to_write += pattern_name
+                else:
+                    pattern_to_write += ";" + pattern_name
+            
+            stats_writer.writerow([password, len(password), warning, pattern_count, pattern_to_write, brute_attempts(password), results.get("guesses"), bit_entropy(brute_attempts(password)), nist_entropy(password), bit_entropy(results.get("guesses"))])
         except Exception:
             continue
 
