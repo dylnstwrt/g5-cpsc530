@@ -119,6 +119,7 @@ def main():
             stats_writer.writerow([password, len(password), warning, pattern_count, pattern_to_write, brute_attempts(password), results.get("guesses"), bit_entropy(brute_attempts(password)), nist_entropy(password), bit_entropy(results.get("guesses"))])
         except Exception:
             continue
+    stats_file.close()
 
 if __name__ == "__main__":
     main()
