@@ -53,20 +53,6 @@ def brute_attempts(password) -> int:
     # rock you precludes a time before LUDS; therefore is it not seen
     return (pow(94, len(password)) - pow(94, 3))
 
-    # TODO password strength entropy using brute guesses vs. zxcvbn guesses
-    '''
-        - frequence of patterns
-        - number of patterns in a password
-            - histogram of password patterns
-        - password guesses
-            - brute force
-        - password entropy
-            - nist (luds)
-            - zxcvbn
-        - most commmon warnings/feedback
-        - write to file
-            - determine formatting
-    '''
 def bit_entropy(attempts) -> int:
     '''
     method:
@@ -120,6 +106,16 @@ def main():
         except Exception:
             continue
     stats_file.close()
+
+    with open("./resources/summary.csv", "w") as summary:
+        writer = csv.writer(summary)
+        for key, value in pattern_freqs.items():
+            writer.writerow([key, value])
+        for key, value in pass_length_freqs.items():
+            writer.writerow([key, value])
+        for key, value in warning_freqs.items():
+            writer.writerow([key, value])
+        summary.close()
 
 if __name__ == "__main__":
     main()
