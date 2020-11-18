@@ -57,6 +57,9 @@ def bit_entropy(attempts) -> int:
     '''
     method:
         calculates entropy using attempts required to guess password
+        assumption is that all attempts are equally likely (see tutorials week 3 for explaination)
+            - for zcxvbn: all combinations of patterns are equally likely (hence the number of attempts)
+            - for naive: all valid brute force combinations are equally likely (this also holds true in zxcvbn for randomly generated passwords)
 
     parameters:
         attempts : int
