@@ -105,10 +105,10 @@ def main():
                 pattern_name = pattern.get("pattern")
                 if pattern_name == "dictionary":
                     pattern_name += "-"+pattern.get("dictionary_name")
-                    if (pattern.get("l33t")):
-                        pattern_name += "-l33t"
-                    if (pattern.get("reversed")):
-                        pattern_name += "-reversed"
+                if (pattern.get("l33t")):
+                    pattern_name += "-l33t"
+                if (pattern.get("reversed")):
+                    pattern_name += "-reversed"
                 pattern_freqs[pattern_name] = pattern_freqs.get(
                     pattern_name, 0) + 1  # update frequency dict
                 if (pattern_to_write == ""):
