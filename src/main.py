@@ -12,6 +12,7 @@ from nist import nist_entropy
 IN_FILENAME = "./resources/rockyou.txt"
 OUT_FILENAME = "./resources/run_stats.csv"
 
+
 def generate_passlist(size) -> list:
     '''
     method:
@@ -29,7 +30,7 @@ def generate_passlist(size) -> list:
         try:
             random_lines = random.choice(lines)
             raw_password = random_lines.strip("\n")
-            #omit passwords less than 4 characters long.
+            # omit passwords less than 4 characters long.
             if len(raw_password) < 4:
                 continue
             passwords.append(raw_password)
@@ -53,6 +54,7 @@ def brute_attempts(password) -> int:
     # rock you precludes a time before LUDS; therefore is it not seen
     return (pow(94, len(password)) - pow(94, 3))
 
+
 def bit_entropy(attempts) -> int:
     '''
     method:
@@ -67,6 +69,7 @@ def bit_entropy(attempts) -> int:
     '''
     return math.log2(attempts)
 
+
 def main():
     pattern_freqs = dict()  # keep track of unique patterns for summary
     pass_length_freqs = dict()  # for histogram of password lengths
@@ -75,13 +78,14 @@ def main():
 
     stats_file = open(OUT_FILENAME, mode="w")
     stats_writer = csv.writer(stats_file, delimiter=",", quotechar='"')
-    stats_writer.writerow(['Password','Password Length', 'Warning', 'Pattern Count', 'Patterns' ,
-                        'Naive Attempts', 'ZXCVBN Attempts', 'Naive Entropy', 'Nist Entropy', 'ZXCVBN Entropy'])
+    stats_writer.writerow(['Password', 'Password Length', 'Warning', 'Pattern Count', 'Patterns',
+                           'Naive Attempts', 'ZXCVBN Attempts', 'Naive Entropy', 'Nist Entropy', 'ZXCVBN Entropy'])
     for password in tqdm.tqdm(passwords):
         try:
-            pass_length_freqs[len(password)] = pass_length_freqs.get(len(password), 0) + 1
+            pass_length_freqs[len(password)] = pass_length_freqs.get(
+                len(password), 0) + 1
             results = zxcvbn(password)  # dict
-            
+
             feedback = results.get("feedback")
             warning = feedback.get("warning")
             warning_freqs[warning] = warning_freqs.get(warning, 0) + 1
@@ -104,8 +108,9 @@ def main():
                     pattern_to_write += pattern_name
                 else:
                     pattern_to_write += ";" + pattern_name
-            
-            stats_writer.writerow([password, len(password), warning, pattern_count, pattern_to_write, brute_attempts(password), results.get("guesses"), bit_entropy(brute_attempts(password)), nist_entropy(password), bit_entropy(results.get("guesses"))])
+
+            stats_writer.writerow([password, len(password), warning, pattern_count, pattern_to_write, brute_attempts(password), results.get(
+                "guesses"), bit_entropy(brute_attempts(password)), nist_entropy(password), bit_entropy(results.get("guesses"))])
         except Exception:
             continue
     stats_file.close()
@@ -119,6 +124,7 @@ def main():
         for key, value in warning_freqs.items():
             writer.writerow([key, value])
         summary.close()
+
 
 if __name__ == "__main__":
     main()
