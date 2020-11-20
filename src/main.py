@@ -12,6 +12,7 @@ from nist import nist_entropy
 IN_FILENAME = "./resources/rockyou.txt"
 OUT_FILENAME = "./resources/run_stats.csv"
 
+
 def generate_passlist(size) -> list:
     '''
     method:
@@ -29,7 +30,7 @@ def generate_passlist(size) -> list:
         try:
             random_lines = random.choice(lines)
             raw_password = random_lines.strip("\n")
-            #omit passwords less than 4 characters long.
+            # omit passwords less than 4 characters long.
             if len(raw_password) < 4:
                 continue
             passwords.append(raw_password)
@@ -53,30 +54,21 @@ def brute_attempts(password) -> int:
     # rock you precludes a time before LUDS; therefore is it not seen
     return (pow(94, len(password)) - pow(94, 3))
 
-    # TODO password strength entropy using brute guesses vs. zxcvbn guesses
-    '''
-        - frequence of patterns
-        - number of patterns in a password
-            - histogram of password patterns
-        - password guesses
-            - brute force
-        - password entropy
-            - nist (luds)
-            - zxcvbn
-        - most commmon warnings/feedback
-        - write to file
-            - determine formatting
-    '''
+
 def bit_entropy(attempts) -> int:
     '''
     method:
         calculates entropy using attempts required to guess password
+        assumption is that all attempts are equally likely (see tutorials week 3 for explaination)
+            - for zcxvbn: all combinations of patterns are equally likely (hence the number of attempts)
+            - for naive: all valid brute force combinations are equally likely (this also holds true in zxcvbn for randomly generated passwords)
 
     parameters:
         attempts : int
             number of attempts
     '''
     return math.log2(attempts)
+
 
 def main():
     pattern_freqs = dict()  # keep track of unique patterns for summary
@@ -86,13 +78,14 @@ def main():
 
     stats_file = open(OUT_FILENAME, mode="w")
     stats_writer = csv.writer(stats_file, delimiter=",", quotechar='"')
-    stats_writer.writerow(['Password','Password Length', 'Warning', 'Pattern Count', 'Patterns' ,
-                        'Naive Attempts', 'ZXCVBN Attempts', 'Naive Entropy', 'Nist Entropy', 'ZXCVBN Entropy'])
+    stats_writer.writerow(['Password', 'Password Length', 'Warning', 'Pattern Count', 'Patterns',
+                           'Naive Attempts', 'ZXCVBN Attempts', 'Naive Entropy', 'Nist Entropy', 'ZXCVBN Entropy'])
     for password in tqdm.tqdm(passwords):
         try:
-            pass_length_freqs[len(password)] = pass_length_freqs.get(len(password), 0) + 1
+            pass_length_freqs[len(password)] = pass_length_freqs.get(
+                len(password), 0) + 1
             results = zxcvbn(password)  # dict
-            
+
             feedback = results.get("feedback")
             warning = feedback.get("warning")
             warning_freqs[warning] = warning_freqs.get(warning, 0) + 1
@@ -115,11 +108,23 @@ def main():
                     pattern_to_write += pattern_name
                 else:
                     pattern_to_write += ";" + pattern_name
-            
-            stats_writer.writerow([password, len(password), warning, pattern_count, pattern_to_write, brute_attempts(password), results.get("guesses"), bit_entropy(brute_attempts(password)), nist_entropy(password), bit_entropy(results.get("guesses"))])
+
+            stats_writer.writerow([password, len(password), warning, pattern_count, pattern_to_write, brute_attempts(password), results.get(
+                "guesses"), bit_entropy(brute_attempts(password)), nist_entropy(password), bit_entropy(results.get("guesses"))])
         except Exception:
             continue
     stats_file.close()
+
+    with open("./resources/summary.csv", "w") as summary:
+        writer = csv.writer(summary)
+        for key, value in pattern_freqs.items():
+            writer.writerow([key, value])
+        for key, value in pass_length_freqs.items():
+            writer.writerow([key, value])
+        for key, value in warning_freqs.items():
+            writer.writerow([key, value])
+        summary.close()
+
 
 if __name__ == "__main__":
     main()
