@@ -13,9 +13,9 @@ def nist_entropy(password):
     hasDigit = False
 
     for c in (range(1, len(password))):
-        if ((c >= 1) or (c >= 7)):
+        if ((c >= 1) or (c <= 8)):
             entropy += 2
-        elif ((c >= 8) or (c <= 19)):
+        elif ((c >= 9) or (c <= 20)):
             entropy += 1.5
         else:
             entropy += 1
