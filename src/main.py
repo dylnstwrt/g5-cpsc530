@@ -1,3 +1,7 @@
+'''
+Author: Dylan Stewart
+'''
+
 #!/usr/bin/python3
 import csv
 import math
@@ -74,7 +78,7 @@ def main():
     pattern_freqs = dict()  # keep track of unique patterns for summary
     pass_length_freqs = dict()  # for histogram of password lengths
     warning_freqs = dict()
-    passwords = generate_passlist(10000)
+    passwords = generate_passlist(14000000)
 
     stats_file = open(OUT_FILENAME, mode="w")
     stats_writer = csv.writer(stats_file, delimiter=",", quotechar='"')
@@ -92,6 +96,7 @@ def main():
 
             sequence = results.get("sequence")  # list of dicts
             pattern_count = len(sequence)
+            # line below causes the weirdness in the dict file, be sure to make a note of it in the final report.
             pattern_to_write = ""
 
             for pattern in sequence:

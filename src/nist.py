@@ -1,3 +1,7 @@
+'''
+Author: Dylan Stewart
+'''
+
 def nist_entropy(password):
     '''
     method:
